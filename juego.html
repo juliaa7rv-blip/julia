@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Snake Mejorado</title>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #0a2a2f, #021014);
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    canvas {
+      background: #06181d;
+      border-radius: 16px;
+      border: 3px solid #6dffb3;
+    }
+
+    .info {
+      margin-top: 12px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 6px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #6dffb3;
+      color: #003322;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #5ae6a0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐍 Snake</h1>
+  <canvas id="game" width="600" height="600"></canvas>
+
+  <div class="info">
+    <div>Puntaje: <span id="score">0</span></div>
+    <button id="restart">Reiniciar</button>
+  </div>
+
+  <script>
+    // ================= CONFIGURACIÓN =================
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const tileSize = 16;                // Más precisión
+    const tiles = canvas.width / tileSize;
+    const speed = 70;                  // Movimiento más fluido
+
+    // ================= ESTADO =================
+    let snake, direction, nextDirection, apple, score, gameInterval;
+
+    // ================= INICIO =================
+    function initGame() {
+      snake = [];
+      for (let i = 0; i < 6; i++) {
+        snake.push({ x: 15 - i, y: 15 });
+      }
+
+      direction = "RIGHT";
+      nextDirection = "RIGHT";
+      score = 0;
+      document.getElementById("score").textContent = score;
+
+      placeApple();
+      clearInterval(gameInterval);
+      gameInterval = setInterval(gameLoop, speed);
+    }
+
+    // ================= MANZANA =================
+    function placeApple() {
+      let valid = false;
+      while (!valid) {
+        apple = {
+          x: Math.floor(Math.random() * tiles),
+          y: Math.floor(Math.random() * tiles)
+        };
+        valid = !snake.some(s => s.x === apple.x && s.y === apple.y);
+      }
+    }
+
+    // ================= CONTROLES =================
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowUp" && direction !== "DOWN") nextDirection = "UP";
+      if (e.key === "ArrowDown" && direction !== "UP") nextDirection = "DOWN";
+      if (e.key === "ArrowLeft" && direction !== "RIGHT") nextDirection = "LEFT";
+      if (e.key === "ArrowRight" && direction !== "LEFT") nextDirection = "RIGHT";
+    });
+
+    document.getElementById("restart").addEventListener("click", initGame);
+
+    // ================= LOOP =================
+    function gameLoop() {
+      direction = nextDirection;
+      update();
+      draw();
+    }
+
+    // ================= ACTUALIZAR =================
+    function update() {
+      const head = { ...snake[0] };
+
+      if (direction === "UP") head.y--;
+      if (direction === "DOWN") head.y++;
+      if (direction === "LEFT") head.x--;
+      if (direction === "RIGHT") head.x++;
+
+      if (
+        head.x < 0 || head.y < 0 ||
+        head.x >= tiles || head.y >= tiles ||
+        snake.some(s => s.x === head.x && s.y === head.y)
+      ) {
+        endGame();
+        return;
+      }
+
+      snake.unshift(head);
+
+      if (head.x === apple.x && head.y === apple.y) {
+        score++;
+        document.getElementById("score").textContent = score;
+        placeApple();
+      } else {
+        snake.pop();
+      }
+    }
+
+    // ================= DIBUJAR =================
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawSnake();
+      drawApple();
+    }
+
+    // ================= SERPIENTE REALISTA =================
+    function drawSnake() {
+      snake.forEach((s, i) => {
+        const cx = s.x * tileSize + tileSize / 2;
+        const cy = s.y * tileSize + tileSize / 2;
+        const r = tileSize / 2 - 1;
+
+        // Degradado corporal
+        const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, r);
+        grad.addColorStop(0, i === 0 ? "#b9ffe0" : "#6dffb3");
+        grad.addColorStop(1, "#1b8f5a");
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cabeza (ojos)
+        if (i === 0) drawEyes(cx, cy, r);
+      });
+    }
+
+    function drawEyes(cx, cy, r) {
+      let ex = 0, ey = 0;
+
+      if (direction === "UP") ey = -r / 3;
+      if (direction === "DOWN") ey = r / 3;
+      if (direction === "LEFT") ex = -r / 3;
+      if (direction === "RIGHT") ex = r / 3;
+
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.arc(cx + ex - 3, cy + ey - 3, 2, 0, Math.PI * 2);
+      ctx.arc(cx + ex + 3, cy + ey + 3, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ================= MANZANA =================
+    function drawApple() {
+      const cx = apple.x * tileSize + tileSize / 2;
+      const cy = apple.y * tileSize + tileSize / 2;
+      const r = tileSize / 2 - 2;
+
+      ctx.fillStyle = "#e53935";
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
+      ctx.beginPath();
+      ctx.arc(cx - 4, cy - 4, r / 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "#4e342e";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - r);
+      ctx.lineTo(cx, cy - r - 6);
+      ctx.stroke();
+
+      ctx.fillStyle = "#43a047";
+      ctx.beginPath();
+      ctx.ellipse(cx + 5, cy - r - 4, 5, 3, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ================= FIN =================
+    function endGame() {
+      clearInterval(gameInterval);
+      alert("Juego terminado 🐍\nPuntaje: " + score);
+    }
+
+    initGame();
+  </script>
+</body>
+</html>
