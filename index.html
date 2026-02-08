@@ -47,79 +47,7 @@
             margin-top: 40px;
         }
   
-}/* Chat flotante */
-#chat-flotante {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 300px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    font-size: 14px;
-    z-index: 9999;
-}
 
-#chat-header {
-    background: #1b5e20;
-    color: white;
-    padding: 10px;
-    border-radius: 10px 10px 0 0;
-    text-align: center;
-    font-weight: bold;
-}
-
-#chat-mensajes {
-    height: 200px;
-    padding: 10px;
-    overflow-y: auto;
-    background: #f5f5f5;
-}
-
-.mensaje-usuario {
-    text-align: right;
-    margin-bottom: 8px;
-}
-
-.mensaje-bot {
-    text-align: left;
-    margin-bottom: 8px;
-}
-
-.mensaje-usuario span {
-    background: #d50000;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 10px;
-    display: inline-block;
-}
-
-.mensaje-bot span {
-    background: #e0e0e0;
-    padding: 6px 10px;
-    border-radius: 10px;
-    display: inline-block;
-}
-
-#chat-input-area {
-    display: flex;
-    border-top: 1px solid #ccc;
-}
-
-#chat-input {
-    flex: 1;
-    border: none;
-    padding: 8px;
-}
-
-#chat-input-area button {
-    border: none;
-    background: #1b5e20;
-    color: white;
-    padding: 8px 12px;
-    cursor: pointer;
-}
 
  </style>
 </head>
@@ -197,47 +125,11 @@
     <footer>
         © 2026 - Web dedicada al Fútbol
     </footer>
-<script>
-function enviarChat() {
-    const input = document.getElementById("chat-input");
-    const mensajes = document.getElementById("chat-mensajes");
-    const texto = input.value.trim().toLowerCase();
 
-    if (texto === "") return;
-
-    mensajes.innerHTML += `
-        <div class="mensaje-usuario">
-            <span>${input.value}</span>
-        </div>
-    `;
-
-    let respuesta = "Lo siento, no entiendo la pregunta.";
-
-    if (texto.includes("reglas")) {
-        respuesta = "Las reglas básicas están en la sección 'Reglas'.";
-    } else if (texto.includes("historia")) {
-        respuesta = "La historia del fútbol está en la primera sección.";
-    } else if (texto.includes("competiciones")) {
-        respuesta = "Las competiciones importantes están explicadas en su sección.";
-    } else if (texto.includes("contacto")) {
-        respuesta = "El contacto está al final de la página.";
-    }
-
-    setTimeout(() => {
-        mensajes.innerHTML += `
-            <div class="mensaje-bot">
-                <span>${respuesta}</span>
-            </div>
-        `;
-        mensajes.scrollTop = mensajes.scrollHeight;
-    }, 500);
-
-    input.value = "";
-}
-</script>
 
 </body>
 </html>
+
 
 
 
