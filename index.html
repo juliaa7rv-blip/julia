@@ -46,7 +46,38 @@
             color: #eee;
             margin-top: 40px;
         }
-    </style>
+   /* Estilos del chat de ayuda */
+#chat {
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+#mensajes {
+    height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 5px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+#mensajes p {
+    margin: 5px 0;
+}
+
+#entrada {
+    width: 75%;
+    padding: 5px;
+}
+
+button {
+    padding: 6px 10px;
+}
+ </style>
 </head>
 
 <body>
@@ -132,9 +163,38 @@
     <footer>
         © 2026 - Web dedicada al Fútbol
     </footer>
+<script>
+function enviarMensaje() {
+    const entrada = document.getElementById("entrada");
+    const mensajes = document.getElementById("mensajes");
+    const texto = entrada.value.toLowerCase();
+
+    if (texto === "") return;
+
+    mensajes.innerHTML += "<p><strong>Tú:</strong> " + entrada.value + "</p>";
+
+    let respuesta = "Lo siento, no entiendo la pregunta.";
+
+    if (texto.includes("reglas")) {
+        respuesta = "Puedes consultar las reglas en la sección 'Reglas básicas'.";
+    } else if (texto.includes("historia")) {
+        respuesta = "La historia del fútbol está explicada en la primera sección.";
+    } else if (texto.includes("competiciones")) {
+        respuesta = "Las competiciones importantes están en su sección correspondiente.";
+    } else if (texto.includes("contacto")) {
+        respuesta = "Puedes encontrar el contacto al final de la página.";
+    }
+
+    mensajes.innerHTML += "<p><strong>Ayuda:</strong> " + respuesta + "</p>";
+
+    entrada.value = "";
+    mensajes.scrollTop = mensajes.scrollHeight;
+}
+</script>
 
 </body>
 </html>
+
 
 
 
